@@ -1,4 +1,4 @@
-//rudimentary PI Control for angular movement
+//normalised rudimentary PI Control for angular movement
 
 package org.usfirst.frc.team3694.robot;
 
@@ -34,7 +34,7 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 	}
 
-	public double[] PI(double setpoint, double kp, double ki, double offset) {
+	public double PI(double setpoint, double kp, double ki, double offset) {
 		//setpoint is the degrees you want to turn 
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
@@ -42,9 +42,6 @@ public class Robot extends IterativeRobot {
 		
 		double cumulativeError = 0;
 			//initial error values before calculation
-		double count = 1;
-			//'count' is the number of times the output is calculated
-		double out = 0;
 		
 		double angle = imu.getAngleZ();
 		double currentError = setpoint - angle;
@@ -63,64 +60,23 @@ public class Robot extends IterativeRobot {
 				proportional = currentError * kp;
 					//calculate proportion
 					//how far we are off * how much we are changing
-					//add the current error to the sum of all past error 
-					
-				out =  proportional + integral;
-					
-				count++; 
-					//updates iteration count for use with mean
+					//add the current error to the sum of all past error 	
 		}	
 		
-		return new double[] {out, count};
+		return proportional + integral;
 			//return the PI output as [0] and the number of iterations as [1] and the previous output is [2]		
-	}
-	
-	public double normalise(double meanOut, double maxOut, double minOut) {
-		double results[] = PI(90, 0.25, 0.1, 1.0);
-			//gets the output of the PI function to be normalised
-		
-		double currentOut = results[0];
-		double count = results[1];
-		
-		
-		if (isAutonomous()) {
-			double cumulativeOut = 0;
-			
-			if (count == 1) {
-				maxOut = currentOut; 
-				minOut = currentOut; 
-				//when starting there is only one output 
-			} else {
-				if (Math.max(currentOut, maxOut) != maxOut) {
-					maxOut = currentOut; 
-				//if the new output is higher than the previous max, update the max
-				}
-					
-				if (Math.min(currentOut, minOut) != minOut) {
-					minOut = currentOut; 
-				//if the new output is lower than the previous min, update the min
-				}
-			}
-			
-			cumulativeOut += currentOut; 
-				//sum all the outputs
-			meanOut = cumulativeOut / count;
-				//find the mean of the outputs
-		}
-		
-		return (currentOut - meanOut) / (maxOut - minOut);
-			//normalisation formula
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		double norm = normalise(0, 0, 0);
-		
-		robotDrive.arcadeDrive(0, norm);
+		double out = PI(90, 0.25, 0.1, 1.0);
+		double normed = out / 1000;
+		robotDrive.arcadeDrive(0, out);
 			//set drivetrain to the output
 		
-		System.out.println("Out: " + norm);
+		System.out.println("Out: " + out);
 		System.out.println("Angle: " + imu.getAngleZ());
+		System.out.println("Normed: " + normed);
 	}
 
 	public void teleopPeriodic() {
