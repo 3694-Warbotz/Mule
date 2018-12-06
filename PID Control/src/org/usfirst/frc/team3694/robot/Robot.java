@@ -1,4 +1,5 @@
-//normalised rudimentary PI Control for angular movement
+//normalised PI Control for angular movement and one encoder
+//TODO: will not work until encoder distance per count is found
 
 package org.usfirst.frc.team3694.robot;
 
@@ -7,6 +8,7 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import sun.nio.cs.DoubleByte.Encoder;
 
 public class Robot extends IterativeRobot {
 	public static final ADIS16448_IMU imu = new ADIS16448_IMU();
@@ -20,11 +22,6 @@ public class Robot extends IterativeRobot {
 	Joystick rightStick = new Joystick(2);
 		//joystick on DS port 2
 	DifferentialDrive robotDrive = new DifferentialDrive(left, right);
-	
-	double integral = 1; 
-		//kp times sum error
-	double proportional = 1; 
-		//kp times error
 
 	@Override
 	public void robotInit() {
@@ -34,55 +31,101 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 	}
 
-	public double PI(double setpoint, double kp, double ki, double offset) {
-		//setpoint is the degrees you want to turn 
+	public double anglePI(double angleSetpoint, double kp, double ki, double angleOffset) {
+		//angleSetpoint is the degrees you want to turn 
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
-		//offset is the margin of error
+		//angleOffset is the margin of error acceptable for turning
 		
-		double cumulativeError = 0;
+		double cumulativeAngularError = 0;
 			//initial error values before calculation
 		
 		double angle = imu.getAngleZ();
-		double currentError = setpoint - angle;
-			//error = target - actual
-
-		if (Math.abs(setpoint - angle) > offset) {
+		
+		if (Math.abs(angleSetpoint - angle) > angleOffset) {
 			//while angle is not correct
+			
 				angle = imu.getAngleZ();
 					//update angle
-				currentError = setpoint - angle; 
-				cumulativeError += currentError;
+				double currentAngularError = setpoint - angle; 
 					//update error
-				integral = cumulativeError * ki;
+				cumulativeAngularError += currentAngularError;
+					//sum of all past error
+				
+				angularIntegral = cumulativeAngularError * ki;
 					//calculate integral
 					//sigma error * integral constant
-				proportional = currentError * kp;
+				angularProportional = currentAngularError * kp;
 					//calculate proportion
 					//how far we are off * how much we are changing
-					//add the current error to the sum of all past error 	
 		}	
+		return angularProportional + angularIntegral; 
+	}
+	
+	
+	public double distancePI(double distanceSetpoint, double kp, double ki, double distanceOffset) {
+		//distanceSetpoint is the distance you want to travel
+		//kp is the proportional constant found by trial
+		//ki is the integral constant found by trial
+		//distanceOffset is the margin of error acceptable for movement
 		
-		return proportional + integral;
-			//return the PI output as [0] and the number of iterations as [1] and the previous output is [2]		
+		double cumulativeMovementError = 0;
+		
+		if (Math.abs(distanceSetpoint - distanceTraveled) > distanceOffset) {
+			//while distance is not correct
+			
+			Encoder rightEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+				//initialises encoder on ports 0 and 1 at the highest possible accuracy 
+			rightEncoder.setDistancePerPulse(5);
+			
+			double distanceTraveled = rightEncoder.getDistance();
+				//update distance
+			double currentMovementError = distanceSetpoint - distanceTraveled;
+				//update error
+			cumulativeMovementError += currentMovementError;
+				//sum past error
+			
+			movementIntegral = cumulativeMovementError * ki;
+				//calculate integral
+				//sigma error * integral constant
+			movementProportional = currentMovementError * kp;
+				//calculate proportion
+				//how far we are off * how much we are changing
+			
+		}
+		return movementProportional + movementIntegral;
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		double out = PI(90, 0.25, 0.1, 1.0);
-		double normed = out / 1000;
-		robotDrive.arcadeDrive(0, out);
-			//set drivetrain to the output
 		
-		System.out.println("Out: " + out);
+		double angleOut= anglePI(90, 0.25, 0.1, 1.0);
+			//turn 90 (+/-1) degrees (kp = 0.25 and ki = 0.1) 
+		double normedAngle = angleOut / 1000;
+			//normalise angle output to give to victor
+		
+		double movementOut = distancePI(36, 0.25, 0.1, 1.0);
+			//wheel moves 10 inches (?) per rotation
+		double normedDistance = movementOut / 1000;
+			//normalise distance output to give to victor
+		
+		robotDrive.arcadeDrive(0, normedAngle);
+		robotDrive.arcadeDrive(normedDistance, 0);
+			//victor on 0 is set to the gyro for testing
+			//victor on 1 is set to the encoder for testing
+	
+		System.out.println("Angle Out: " + angleOut);
 		System.out.println("Angle: " + imu.getAngleZ());
-		System.out.println("Normed: " + normed);
+		System.out.println("Normed Angle: " + normedAngle);
+		System.out.println("Percent Traveled: " + (distanceTraveled / distanceSetpoint));
+		System.out.println("Movement Out: " + movementOut);
+		Sysyem.out.println("Normed Distance: " + normedDistance);
 	}
 
 	public void teleopPeriodic() {
-		//basic tank drive
 		left.set(leftStick.getY());
 		right.set(rightStick.getY());
+			//basic tank drive
 	}
 
 	@Override
