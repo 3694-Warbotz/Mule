@@ -1,14 +1,14 @@
 //normalised PI Control for angular movement and one encoder
-//TODO: will not work until encoder distance per count is found
 
 package org.usfirst.frc.team3694.robot;
 
 import com.analog.adis16448.frc.ADIS16448_IMU;
+
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import sun.nio.cs.DoubleByte.Encoder;
 
 public class Robot extends IterativeRobot {
 	public static final ADIS16448_IMU imu = new ADIS16448_IMU();
@@ -31,11 +31,12 @@ public class Robot extends IterativeRobot {
 	public void autonomousInit() {
 	}
 
-	public double anglePI(double angleSetpoint, double kp, double ki, double angleOffset) {
+	public double anglePI(double angleSetpoint, double kp, double ki, double angleOffset, double angularProportional, double angularIntegral) {
 		//angleSetpoint is the degrees you want to turn 
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
 		//angleOffset is the margin of error acceptable for turning
+		// angularProportional and angularIntegral are initialised here and should be set to 0
 		
 		double cumulativeAngularError = 0;
 			//initial error values before calculation
@@ -47,7 +48,7 @@ public class Robot extends IterativeRobot {
 			
 				angle = imu.getAngleZ();
 					//update angle
-				double currentAngularError = setpoint - angle; 
+				double currentAngularError = angleSetpoint - angle; 
 					//update error
 				cumulativeAngularError += currentAngularError;
 					//sum of all past error
@@ -56,18 +57,19 @@ public class Robot extends IterativeRobot {
 					//calculate integral
 					//sigma error * integral constant
 				angularProportional = currentAngularError * kp;
-					//calculate proportion
+					//calculate proportional
 					//how far we are off * how much we are changing
 		}	
 		return angularProportional + angularIntegral; 
 	}
 	
 	
-	public double distancePI(double distanceSetpoint, double kp, double ki, double distanceOffset) {
+	public double distancePI(double distanceSetpoint, double kp, double ki, double distanceOffset, double movementProportional, double movementIntegral, double distanceTraveled) {
 		//distanceSetpoint is the distance you want to travel
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
 		//distanceOffset is the margin of error acceptable for movement
+		// movementProportional, movementIntegral, and distanceTraveled are initialised here and should be set to 0
 		
 		double cumulativeMovementError = 0;
 		
@@ -78,7 +80,7 @@ public class Robot extends IterativeRobot {
 				//initialises encoder on ports 0 and 1 at the highest possible accuracy 
 			rightEncoder.setDistancePerPulse(5);
 			
-			double distanceTraveled = rightEncoder.getDistance();
+			distanceTraveled = rightEncoder.getDistance();
 				//update distance
 			double currentMovementError = distanceSetpoint - distanceTraveled;
 				//update error
@@ -89,7 +91,7 @@ public class Robot extends IterativeRobot {
 				//calculate integral
 				//sigma error * integral constant
 			movementProportional = currentMovementError * kp;
-				//calculate proportion
+				//calculate proportional
 				//how far we are off * how much we are changing
 			
 		}
@@ -99,27 +101,26 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		double angleOut= anglePI(90, 0.25, 0.1, 1.0);
+		double angleOut= anglePI(90, 0.25, 0.1, 1.0, 0, 0);
 			//turn 90 (+/-1) degrees (kp = 0.25 and ki = 0.1) 
 		double normedAngle = angleOut / 1000;
 			//normalise angle output to give to victor
 		
-		double movementOut = distancePI(36, 0.25, 0.1, 1.0);
+		double movementOut = distancePI(36, 0.25, 0.1, 1.0, 0, 0, 0);
 			//wheel moves 10 inches (?) per rotation
 		double normedDistance = movementOut / 1000;
 			//normalise distance output to give to victor
 		
 		robotDrive.arcadeDrive(0, normedAngle);
 		robotDrive.arcadeDrive(normedDistance, 0);
-			//victor on 0 is set to the gyro for testing
-			//victor on 1 is set to the encoder for testing
+			//victor on 1 is set to the gyro for testing
+			//victor on 0 is set to the encoder for testing
 	
 		System.out.println("Angle Out: " + angleOut);
 		System.out.println("Angle: " + imu.getAngleZ());
 		System.out.println("Normed Angle: " + normedAngle);
-		System.out.println("Percent Traveled: " + (distanceTraveled / distanceSetpoint));
 		System.out.println("Movement Out: " + movementOut);
-		Sysyem.out.println("Normed Distance: " + normedDistance);
+		System.out.println("Normed Distance: " + normedDistance);
 	}
 
 	public void teleopPeriodic() {
