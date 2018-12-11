@@ -42,13 +42,14 @@ public class Robot extends IterativeRobot {
 			//initial error values before calculation
 		
 		double angle = imu.getAngleZ();
+		double currentAngularError;
 		
 		if (Math.abs(angleSetpoint - angle) > angleOffset) {
 			//while angle is not correct
 			
 				angle = imu.getAngleZ();
 					//update angle
-				double currentAngularError = angleSetpoint - angle; 
+				currentAngularError = angleSetpoint - angle; 
 					//update error
 				cumulativeAngularError += currentAngularError;
 					//sum of all past error
@@ -72,6 +73,7 @@ public class Robot extends IterativeRobot {
 		// movementProportional, movementIntegral, and distanceTraveled are initialised here and should be set to 0
 		
 		double cumulativeMovementError = 0;
+		double currentMovementError;
 		
 		if (Math.abs(distanceSetpoint - distanceTraveled) > distanceOffset) {
 			//while distance is not correct
@@ -82,7 +84,7 @@ public class Robot extends IterativeRobot {
 			
 			distanceTraveled = rightEncoder.getDistance();
 				//update distance
-			double currentMovementError = distanceSetpoint - distanceTraveled;
+			currentMovementError = distanceSetpoint - distanceTraveled;
 				//update error
 			cumulativeMovementError += currentMovementError;
 				//sum past error
