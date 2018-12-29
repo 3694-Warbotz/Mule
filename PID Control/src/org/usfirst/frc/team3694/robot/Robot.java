@@ -19,8 +19,10 @@ public class Robot extends IterativeRobot {
 	Joystick rightStick = new Joystick(RobotMap.rightStick);
 	//ports given in RobotMap.java 
 	
+	Encoder rightEncoder = new Encoder(RobotMap.encoderPort1, RobotMap.encoderPort2, false, Encoder.EncodingType.k4X);
+	//initialises encoder on ports 0 and 1 at the highest possible accuracy 
+	
 	DifferentialDrive robotDrive = new DifferentialDrive(left, right);
-		
 	
 	@Override
 	public void robotInit() {
@@ -72,12 +74,10 @@ public class Robot extends IterativeRobot {
 		double cumulativeMovementError = 0;
 		double currentMovementError;
 		
+		rightEncoder.reset();
+		
 		if (Math.abs(distanceSetpoint - distanceTraveled) > distanceOffset) {
 			//while distance is not correct
-			
-			Encoder rightEncoder = new Encoder(RobotMap.encoderPort1, RobotMap.encoderPort2, false, Encoder.EncodingType.k4X);
-				//initialises encoder on ports 0 and 1 at the highest possible accuracy 
-			rightEncoder.setDistancePerPulse(5);
 			
 			distanceTraveled = rightEncoder.getDistance();
 				//update distance
