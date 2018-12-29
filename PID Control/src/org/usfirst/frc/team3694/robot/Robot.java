@@ -3,26 +3,25 @@
 package org.usfirst.frc.team3694.robot;
 
 import com.analog.adis16448.frc.ADIS16448_IMU;
-
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import org.usfirst.frc.team3694.robot.RobotMap;
 
 public class Robot extends IterativeRobot {
 	public static final ADIS16448_IMU imu = new ADIS16448_IMU();
 	
-	Victor left = new Victor(0);
-		//victor on robot port 0
-	Victor right = new Victor(1);
-		//victor on robot port 1
-	Joystick leftStick = new Joystick(1);
-		//joystick on DS port 1
-	Joystick rightStick = new Joystick(2);
-		//joystick on DS port 2
+	Victor left = new Victor(RobotMap.leftMotor); 
+	Victor right = new Victor(RobotMap.rightMotor);
+	Joystick leftStick = new Joystick(RobotMap.leftStick);
+	Joystick rightStick = new Joystick(RobotMap.rightStick);
+	//ports given in RobotMap.java 
+	
 	DifferentialDrive robotDrive = new DifferentialDrive(left, right);
-
+		
+	
 	@Override
 	public void robotInit() {
 	}
@@ -36,7 +35,6 @@ public class Robot extends IterativeRobot {
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
 		//angleOffset is the margin of error acceptable for turning
-		// angularProportional and angularIntegral are initialised here and should be set to 0
 		
 		double cumulativeAngularError = 0;
 			//initial error values before calculation
@@ -58,7 +56,7 @@ public class Robot extends IterativeRobot {
 					//calculate integral
 					//sigma error * integral constant
 				angularProportional = currentAngularError * kp;
-					//calculate proportional
+					//calculate proportion
 					//how far we are off * how much we are changing
 		}	
 		return angularProportional + angularIntegral; 
@@ -70,7 +68,6 @@ public class Robot extends IterativeRobot {
 		//kp is the proportional constant found by trial
 		//ki is the integral constant found by trial
 		//distanceOffset is the margin of error acceptable for movement
-		// movementProportional, movementIntegral, and distanceTraveled are initialised here and should be set to 0
 		
 		double cumulativeMovementError = 0;
 		double currentMovementError;
@@ -78,7 +75,7 @@ public class Robot extends IterativeRobot {
 		if (Math.abs(distanceSetpoint - distanceTraveled) > distanceOffset) {
 			//while distance is not correct
 			
-			Encoder rightEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+			Encoder rightEncoder = new Encoder(RobotMap.encoderPort1, RobotMap.encoderPort2, false, Encoder.EncodingType.k4X);
 				//initialises encoder on ports 0 and 1 at the highest possible accuracy 
 			rightEncoder.setDistancePerPulse(5);
 			
@@ -93,10 +90,10 @@ public class Robot extends IterativeRobot {
 				//calculate integral
 				//sigma error * integral constant
 			movementProportional = currentMovementError * kp;
-				//calculate proportional
+				//calculate proportion
 				//how far we are off * how much we are changing
-			
 		}
+		
 		return movementProportional + movementIntegral;
 	}
 	
@@ -115,8 +112,8 @@ public class Robot extends IterativeRobot {
 		
 		robotDrive.arcadeDrive(0, normedAngle);
 		robotDrive.arcadeDrive(normedDistance, 0);
-			//victor on 1 is set to the gyro for testing
-			//victor on 0 is set to the encoder for testing
+			//victor on 0 is set to the gyro for testing
+			//victor on 1 is set to the encoder for testing
 	
 		System.out.println("Angle Out: " + angleOut);
 		System.out.println("Angle: " + imu.getAngleZ());
