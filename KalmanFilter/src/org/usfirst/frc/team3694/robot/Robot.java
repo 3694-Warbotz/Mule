@@ -1,3 +1,9 @@
+//Colt math library Documentation:
+//https://dst.lbl.gov/ACSSoftware/colt/api/overview-summary.html
+
+//Kalman Filter Explanation:
+//https://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/
+
 package org.usfirst.frc.team3694.robot;
 
 import com.analog.adis16448.frc.ADIS16448_IMU;
@@ -15,7 +21,7 @@ public class Robot extends IterativeRobot {
 	Encoder rightEncoder = new Encoder(RobotMap.encoderPort1, RobotMap.encoderPort2, false, Encoder.EncodingType.k4X);
 	Timer timer = new Timer();
 	
-	public int kalman() {
+	public double kalman() {
 		
 		double angle = imu.getAngle();
 		double position = rightEncoder.getDistance();

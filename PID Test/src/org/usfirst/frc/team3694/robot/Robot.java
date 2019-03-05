@@ -1,5 +1,29 @@
-package org.usfirst.frc.team3694.robot;
+//TODO:
+//IF IT DOES NOT WORK:
+//1) Increase Proportional Band
+//2) Play with hyperparameters
+//3A) Replace the //INTEGRAL// section with this:
+		/*
+		cumulativeError += currentError;
+		integral = cumulativeError * ki
+		if (integral > maxOut) {
+			integral = maxOut;
+		}
+		*/
+//3B) Replace it with this:
+		/*
+		cumulativeError += currentError;
+		integral = cumulativeError * ki
+		if (integral > maxOut) {
+			integral = 0;
+		}
+		*/
+//4) Try something else
+//IF IT DOES WORK:
+//1) Add Ramping 
+//2) Make it work with the encoders
 
+package org.usfirst.frc.team3694.robot;
 import com.analog.adis16448.frc.ADIS16448_IMU;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -66,6 +90,8 @@ public class Robot extends IterativeRobot {
 		if (integral < maxOut) {
 			integral = cumulativeError * ki;
 		}
+		
+		
 		
 		double out = proportional + integral;
 		
