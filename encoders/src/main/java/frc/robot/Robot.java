@@ -41,8 +41,7 @@ public class Robot extends IterativeRobot {
   Encoder rightBackEnc = new Encoder(4, 5, false, Encoder.EncodingType.k4X);
   Encoder leftBackEnc = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
 
-  PIDController pidLeftFront = new PIDController(0,0,0, leftFrontEnc, leftFront);
-  leftFrontEnc.setPIDSourceType(PIDSourceType.kDisplacement); 
+  
 
   
 
@@ -89,6 +88,25 @@ public class Robot extends IterativeRobot {
   
   @Override
   public void autonomousPeriodic() {
+    // Configures the encoder to return a distance of 4 for every 256 pulses
+    // Also changes the units of getRate
+    leftFrontEnc.setDistancePerPulse(4./256.);
+
+    // Configures the encoder to consider itself stopped after .1 seconds
+    leftFrontEnc.setMaxPeriod(.1);
+
+    // Configures the encoder to consider itself stopped when its rate is below 10
+    leftFrontEnc.setMinRate(10);
+
+    // Reverses the direction of the encoder
+    leftFrontEnc.setReverseDirection(true);
+
+    // Configures an encoder to average its period measurement over 5 samples
+    // Can be between 1 and 127 samples
+    leftFrontEnc.setSamplesToAverage(5);
+
+
+
     for (int i = 0; i < 6; i++) {
       double startPoint = 0;
       double distance = distances[i];
