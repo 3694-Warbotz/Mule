@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup; 
 
 
+
+
 public class Robot extends IterativeRobot {
   
 
@@ -41,30 +43,28 @@ public class Robot extends IterativeRobot {
   Encoder rightBackEnc = new Encoder(4, 5, false, Encoder.EncodingType.k4X);
   Encoder leftBackEnc = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
 
-  
+  public void turnLeft() { 
+    for (int z = 0; z > 9; z++) {
+    right.tankDrive( .5, .5);
+    }
+  }
 
-  
+  public void turnRight() {
+    for (int z = 0; z > 9; z++) {
+      left.tankDrive(.5, .5);
+    }
+  }
 
-  
+
 
   double[] distances = {540, 1956, 1572, 120, 192, 780, 528, 372}; 
-  double[] turns = {-90, 180, 90, 90, -90, -90, -90}; 
+  
+  String[] turns = {left, full, right, right, left, left, left}; 
 
-  double startPoint;
+  double startPoint = 0;
 
   //diameter of wheels = 6 inches
   //circumference of wheels = 18.84 inches
-
-
-
-
-
-
-
-
-
-
-
 
 
   @Override
@@ -90,8 +90,8 @@ public class Robot extends IterativeRobot {
   public void autonomousPeriodic() {
     // Configures the encoder to return a distance of 4 for every 256 pulses
     // Also changes the units of getRate
-    leftFrontEnc.setDistancePerPulse(4./256.);
-
+    leftFrontEnc.setDistancePerPulse(1 / 48);
+ 
     // Configures the encoder to consider itself stopped after .1 seconds
     leftFrontEnc.setMaxPeriod(.1);
 
@@ -105,29 +105,30 @@ public class Robot extends IterativeRobot {
     // Can be between 1 and 127 samples
     leftFrontEnc.setSamplesToAverage(5);
 
-
-
-    for (int i = 0; i < 6; i++) {
-      double startPoint = 0;
-      double distance = distances[i];
-      double turn = turns[i];
+  
+    //for (int i = 0; i < 7; i++) { //distances[i]
+      if(encoder.getDistance < 10 ) {
+      drive.tankDrive(.5, .5);
+    } else {
+      drive.tankDrive(0, 0);
+    /*  if (turns[i] = left) {
+        turnLeft;
+      }
+      */  
 
       
-  
-
     }
-  
+  leftFrontEnc.reset(0);  
+      
   }
- 
+
+  //  }
 
   
   @Override
   public void teleopPeriodic() {
     left.set(leftStick.getY());
     right.set(rightStick.getY());
-
-    
-
 
     
   }
