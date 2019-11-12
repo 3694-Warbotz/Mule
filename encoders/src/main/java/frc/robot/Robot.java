@@ -25,117 +25,105 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 
 
 public class Robot extends IterativeRobot {
-  
-
-  Victor leftFront = new Victor(0);
-  Victor rightFront = new Victor(1);
-  Victor leftBack = new Victor(2);
-  Victor rightBack = new Victor(3);
-
-  Joystick leftStick = new Joystick(0);
-  Joystick rightStick = new Joystick(1);
-
-  SpeedControllerGroup left = new SpeedControllerGroup(leftFront, leftBack);
-  SpeedControllerGroup right = new SpeedControllerGroup(rightFront, rightBack);
-
-  Encoder rightFrontEnc = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
-  Encoder leftFrontEnc = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
-  Encoder rightBackEnc = new Encoder(4, 5, false, Encoder.EncodingType.k4X);
-  Encoder leftBackEnc = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
-
-  public void turnLeft() { 
-    for (int z = 0; z < 9; z++) {
-    right.tankDrive( .5, .5);
-    }
-  }
-
-  public void turnRight() {
-    for (int z = 0; z < 9; z++) {
-      left.tankDrive(.5, .5);
-    }
-  }
-
-  public void turnAround() { 
-    for (int z = 0; z < 18; z++) {
-      left.tankDrive(.5, .5);
-    }
-  }
-
-  double[] distances = {540, 1956, 1572, 120, 192, 780, 528, 372}; 
-  
-  String[] turns = {left, full, right, right, left, left, left}; 
-
-  double startPoint = 0;
-
-  //diameter of wheels = 6 inches
-  //circumference of wheels = 18.84 inches
 
 
-  @Override
-  public void robotInit() {
-   
-  
+	Victor leftFront = new Victor(0);
+	Victor rightFront = new Victor(1);
+	Victor leftBack = new Victor(2);
+	Victor rightBack = new Victor(3);
 
-  }
+	Joystick leftStick = new Joystick(0);
+	Joystick rightStick = new Joystick(1);
+
+	SpeedControllerGroup left = new SpeedControllerGroup(leftFront, leftBack);
+	SpeedControllerGroup right = new SpeedControllerGroup(rightFront, rightBack);
+
+	Encoder rightFrontEnc = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+	Encoder leftFrontEnc = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
+	Encoder rightBackEnc = new Encoder(4, 5, false, Encoder.EncodingType.k4X);
+	Encoder leftBackEnc = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
+
+	public void turnLeft() { 
+		for (int z = 0; z < 9; z++) {
+			right.tankDrive(0.5, 0.5);
+		}
+	}
+
+	public void turnRight() {
+		for (int z = 0; z < 9; z++) {
+			left.tankDrive(0.5, 0.5);
+		}
+	}
+
+	public void turnAround() { 
+		for (int z = 0; z < 18; z++) {
+			left.tankDrive(0.5, 0.5);
+		}
+	}
+
+	double[] distances = {540, 1956, 1572, 120, 192, 780, 528, 372}; 
+
+	String[] turns = {"left", "full", "right", "right", "left", "left", "left"}; 
 
 
-  @Override
-  public void robotPeriodic() {
-  }
+	//diameter of wheels = 6 inches
+	//circumference of wheels = 18.84 inches
 
- 
-  @Override
-  public void autonomousInit() {
-  
-  }
 
-  
-  @Override
-  public void autonomousPeriodic() {
-    leftFrontEnc.setDistancePerPulse(1 / 48); //pulses per second = 48 (blame michael if wrong)
-    leftFrontEnc.setMaxPeriod(.1);
-    leftFrontEnc.setMinRate(10);
-    leftFrontEnc.setReverseDirection(true);
-    leftFrontEnc.setSamplesToAverage(5);
+	@Override
+	public void robotInit() {
 
-  
-    for (int i = 0; i < 7; i++) { 
-      if(encoder.getDistance < distances[i] ) {
-      drive.tankDrive(.5, .5);
-      if (turns[i] = left) {
-        turnLeft();
-      }
-      else if (turns[i] = right) {
-        turnRight();
-      }
-      else if  (turns[i] = left) {
-        turnAround();
 
-      } 
-    } else {
-      drive.tankDrive(0, 0);
-      
-        
 
-  
-    }
-  leftFrontEnc.reset(0);  
-      
-  }
+	}
 
-    }
 
-  
-  @Override
-  public void teleopPeriodic() {
-    left.set(leftStick.getY());
-    right.set(rightStick.getY());
+	@Override
+	public void robotPeriodic() {
+	}
 
-    
-  }
 
-  
-  @Override
-  public void testPeriodic() {
-  }
+	@Override
+	public void autonomousInit() {
+
+	}
+
+
+	@Override
+	public void autonomousPeriodic() {
+		leftFrontEnc.setDistancePerPulse(1 / 48); //pulses per second = 48 (blame michael if wrong)
+		leftFrontEnc.setMaxPeriod(0.1);
+		leftFrontEnc.setMinRate(10);
+		leftFrontEnc.setReverseDirection(true);
+		leftFrontEnc.setSamplesToAverage(5);
+
+
+		for (int i = 0; i < 7; i++) { 
+			if(encoder.getDistance < distances[i] ) {
+				drive.tankDrive(0.5, 0.5);
+				if (turns[i] == "left") {
+					turnLeft();
+				} else if (turns[i] == "right") {
+					turnRight();
+				} else if  (turns[i] == "left") {
+					turnAround();
+				} 
+			} else {
+				drive.tankDrive(0, 0);
+			}
+		leftFrontEnc.reset(0);  
+		}
+	}
+
+
+	@Override
+	public void teleopPeriodic() {
+		left.set(leftStick.getY());
+		right.set(rightStick.getY());
+	}
+
+
+	@Override
+	public void testPeriodic() {
+	}
 }
