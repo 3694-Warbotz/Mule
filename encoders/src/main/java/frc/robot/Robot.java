@@ -44,18 +44,22 @@ public class Robot extends IterativeRobot {
   Encoder leftBackEnc = new Encoder(6, 7, false, Encoder.EncodingType.k4X);
 
   public void turnLeft() { 
-    for (int z = 0; z > 9; z++) {
+    for (int z = 0; z < 9; z++) {
     right.tankDrive( .5, .5);
     }
   }
 
   public void turnRight() {
-    for (int z = 0; z > 9; z++) {
+    for (int z = 0; z < 9; z++) {
       left.tankDrive(.5, .5);
     }
   }
 
-
+  public void turnAround() { 
+    for (int z = 0; z < 18; z++) {
+      left.tankDrive(.5, .5);
+    }
+  }
 
   double[] distances = {540, 1956, 1572, 120, 192, 780, 528, 372}; 
   
@@ -88,41 +92,38 @@ public class Robot extends IterativeRobot {
   
   @Override
   public void autonomousPeriodic() {
-    // Configures the encoder to return a distance of 4 for every 256 pulses
-    // Also changes the units of getRate
-    leftFrontEnc.setDistancePerPulse(1 / 48);
- 
-    // Configures the encoder to consider itself stopped after .1 seconds
+    leftFrontEnc.setDistancePerPulse(1 / 48); //pulses per second = 48 (blame michael if wrong)
     leftFrontEnc.setMaxPeriod(.1);
-
-    // Configures the encoder to consider itself stopped when its rate is below 10
     leftFrontEnc.setMinRate(10);
-
-    // Reverses the direction of the encoder
     leftFrontEnc.setReverseDirection(true);
-
-    // Configures an encoder to average its period measurement over 5 samples
-    // Can be between 1 and 127 samples
     leftFrontEnc.setSamplesToAverage(5);
 
   
-    //for (int i = 0; i < 7; i++) { //distances[i]
-      if(encoder.getDistance < 10 ) {
+    for (int i = 0; i < 7; i++) { 
+      if(encoder.getDistance < distances[i] ) {
       drive.tankDrive(.5, .5);
+      if (turns[i] = left) {
+        turnLeft();
+      }
+      else if (turns[i] = right) {
+        turnRight();
+      }
+      else if  (turns[i] = left) {
+        turnAround();
+
+      } 
     } else {
       drive.tankDrive(0, 0);
-    /*  if (turns[i] = left) {
-        turnLeft;
-      }
-      */  
-
       
+        
+
+  
     }
   leftFrontEnc.reset(0);  
       
   }
 
-  //  }
+    }
 
   
   @Override
