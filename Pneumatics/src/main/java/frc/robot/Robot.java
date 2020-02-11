@@ -3,12 +3,9 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SolenoidBase;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class Robot extends TimedRobot {
 	public static Victor leftFront = new Victor(0);
@@ -17,13 +14,13 @@ public class Robot extends TimedRobot {
 	public static Victor rightBack = new Victor(3);
 	public static SpeedControllerGroup left = new SpeedControllerGroup(leftFront, leftBack);
 	public static SpeedControllerGroup right = new SpeedControllerGroup(rightFront, rightBack);
-	
+
 	public static Joystick leftStick = new Joystick(0);
 	public static Joystick rightStick = new Joystick(1);
 
 	@Override
 	public void robotInit() {
-		OI.sole.clearAllPCMStickyFaults();
+		OI.sole.clearAllPCMStickyFaults(0);
 		CameraServer.getInstance().startAutomaticCapture();
 	}
 
@@ -49,6 +46,10 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		left.set(-leftStick.getY());
 		right.set(rightStick.getY());
+
+		if (OI.trigger.get() == true) {
+			OI.sole.set(true);
+		}
 	}
 
 
