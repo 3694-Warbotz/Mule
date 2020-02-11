@@ -17,7 +17,8 @@ public class OI {
 	public static SpeedControllerGroup left = new SpeedControllerGroup(leftFront, leftBack);
 	public static SpeedControllerGroup right = new SpeedControllerGroup(rightFront, rightBack);
 
-	public static Solenoid sole = new Solenoid(0);
+	public static Solenoid sole1 = new Solenoid(0);
+	public static Solenoid sole2 = new Solenoid(1);
 	
 	public static Joystick leftDrive = new Joystick(0);
 	public static Joystick rightDrive = new Joystick(1);
