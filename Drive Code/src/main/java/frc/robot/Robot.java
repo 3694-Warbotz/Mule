@@ -2,57 +2,44 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.SolenoidBase;
-import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class Robot extends TimedRobot {
-	public static Victor leftFront = new Victor(0);
-	public static Victor rightFront = new Victor(1);
-	public static Victor leftBack = new Victor(2);
-	public static Victor rightBack = new Victor(3);
-	public static SpeedControllerGroup left = new SpeedControllerGroup(leftFront, leftBack);
-	public static SpeedControllerGroup right = new SpeedControllerGroup(rightFront, rightBack);
-	
-	public static Joystick leftStick = new Joystick(0);
-	public static Joystick rightStick = new Joystick(1);
-
 	@Override
 	public void robotInit() {
-		OI.sole.clearAllPCMStickyFaults();
 		CameraServer.getInstance().startAutomaticCapture();
+		Rangefinder.init(OI.rangeFinderPort);
 	}
 
 
 	@Override
-	public void robotPeriodic() {
-	}
+	public void robotPeriodic() {}
 
 
 	@Override
-	public void autonomousInit() {
-	
-	}
-
+	public void autonomousInit() {}
 
 	@Override
 	public void autonomousPeriodic() {
-		
+		System.out.println(Rangefinder.start());
 	}
 
-	
+	public static void fire() {
+		if (OI.trigger.get() == true) {
+			OI.sole1.set(true);
+		} else {
+			OI.sole1.set(false);
+		}
+		System.out.println(OI.sole1.get());
+	}
+
 	@Override
 	public void teleopPeriodic() {
-		left.set(-leftStick.getY());
-		right.set(rightStick.getY());
+		OI.left.set(OI.leftDrive.getY());
+		OI.right.set(-OI.rightDrive.getY());
+		fire();
 	}
-
 
 	@Override
-	public void testPeriodic() {
-	}
+	public void testPeriodic() {}
 }
