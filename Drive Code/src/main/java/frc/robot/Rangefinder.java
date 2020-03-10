@@ -1,9 +1,7 @@
 package frc.robot;
 
 import java.nio.ByteBuffer;
-
 import edu.wpi.first.hal.I2CJNI;
-import edu.wpi.first.wpilibj.I2C;
 
 public class Rangefinder {
     private static int port = OI.rangeFinderPort;
@@ -29,20 +27,10 @@ public class Rangefinder {
 		return buffer.get(0);
     }
 
-    public static byte measure() {
+    public static void measure() { //distance in centimeters
         write(0x00, 0x04);
-        while (read(0x01, 1) != (byte) 0100000) {
-            measure();
+        if (read(0x01, 1) == (byte) 0100000) {
+            System.out.println(read(0x8f, 2));
         }
-        return read(0x8f, 2);
-    }
-
-    public static int convert(byte distance) {
-        int centimeters = (int) distance;
-        return centimeters;
-    }
-
-    public static int start() {
-        return convert(measure());
     }
 }

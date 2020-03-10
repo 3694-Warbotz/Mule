@@ -11,17 +11,15 @@ public class Robot extends TimedRobot {
 		Rangefinder.init(OI.rangeFinderPort);
 	}
 
-
 	@Override
 	public void robotPeriodic() {}
-
 
 	@Override
 	public void autonomousInit() {}
 
 	@Override
 	public void autonomousPeriodic() {
-		System.out.println(Rangefinder.start());
+	
 	}
 
 	public static void fire() {
@@ -30,7 +28,6 @@ public class Robot extends TimedRobot {
 		} else {
 			OI.sole1.set(false);
 		}
-		System.out.println(OI.sole1.get());
 	}
 
 	@Override
